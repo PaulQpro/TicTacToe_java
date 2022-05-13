@@ -1,8 +1,92 @@
+package edu.project.tictactoe;
+
 import java.util.Scanner;
 
 class Main {
     public static void main(String[] args) {
-        Scanner scan = new Scanner(System.in);
+        tictactoeHelper helper = new tictactoeHelper();
+        char res = helper.menu(MenuTypes.UI);
+        while (res != 'q') {
+            if (res == 'p') {
+                int players = helper.PlayersSelector();
+                String pl1 = helper.SymbolSelector();
+                String pl2 = "0";
+                switch (pl1) {
+                    case "X":
+                        pl2 = "0";
+                        break;
+                    case "0":
+                        pl2 = "X";
+                        break;
+                }
+                tictactoe game = new tictactoe(players, pl1, pl2);
+                game.start();
+                res = helper.menu(MenuTypes.CONSOLE);
+            }
+            else if (res == 'h') {
+                helper.help();
+                res = helper.menu(MenuTypes.CONSOLE);
+            }
+        }
+        System.out.print("Goodbye!");
+    }
+}
+
+enum MenuTypes{
+    UI,
+    CONSOLE
+}
+
+class tictactoeHelper {
+    private final Scanner scan = new Scanner(System.in);
+    public void help(){
+        System.out.println("   ┌────────────────────┐");
+        System.out.println("═══╡This is a 3*3 board ╞═══");
+        System.out.println("   ╞════════════════════╡");
+        System.out.println("   │      A   B   C     │");
+        System.out.println("   │    ╔═══╦═══╦═══╗   │");
+        System.out.println("   │  1 ║   ║   ║   ║   │");
+        System.out.println("   │    ╠═══╬═══╬═══╣   │");
+        System.out.println("───┤  2 ║   ║   ║   ║   ├───");
+        System.out.println("   │    ╠═══╬═══╬═══╣   │");
+        System.out.println("   │  3 ║   ║   ║   ║   │");
+        System.out.println("   │    ╚═══╩═══╩═══╝   │");
+        System.out.println("   └────────────────────┘");
+        System.out.println("To put symbol onto in you have to type:\n    1) 'A1', 'B2', 'C1', etc.;\n    2) 'a1', 'b2', 'c1', etc.;");
+        System.out.println("and not:\n    1) '1A', '2B', '1C', etc.;\n    2) '1a', '2b', '1c', etc.;");
+        System.out.println("P.S.: If you don't no common tic-tac-toe rules,\n      search in Google, not here!");
+    }
+    public char menu( MenuTypes type){
+        char r;
+        if(type == MenuTypes.UI) {
+            System.out.println("═══════════╦═════════════╦═══════════");
+            System.out.println("───────────╢ Tic-Tac-Toe ╟───────────");
+            System.out.println("═══════════╩═════════════╩═══════════");
+            System.out.println("        ───┤ 'P' -- Play ├───");
+            System.out.println("        ───┤ 'H' -- Help ├───");
+            System.out.println("        ───┤ 'Q' -- Quit ├───");
+            System.out.println("        ───┤ 'M' -- Menu ├───");
+            System.out.println("═════════════════════════════════════");
+        }
+        boolean err = true;
+        do{
+            System.out.print("tictactoe\\>");
+            r = scan.nextLine().toLowerCase().charAt(0);
+            if(!(r=='q'||r=='h'||r=='p'||r=='m')){
+                System.out.println("Wrong! Select one from menu");
+            }
+            else {
+                err = false;
+            }
+        }while (err);
+        if(r=='m'){
+            return menu(MenuTypes.UI);
+        }
+        else{
+            return r;
+        }
+    }
+    public int PlayersSelector(){
         System.out.println("Enter number of players (1 or 2)");
         String input = scan.nextLine();
         input = input.trim();
@@ -12,44 +96,24 @@ class Main {
             input = scan.nextLine();
             input = input.trim();
         }
-        players = Integer.parseInt(input);
-        tictactoeHelper helper = new tictactoeHelper();
-        String pl1 = helper.SymbolSelector();
-        String pl2 = "0";
-        switch (pl1) {
-            case "X":
-                pl2 = "0";
-                break;
-            case "0":
-                pl2 = "X";
-                break;
-        }
-        tictactoe game = new tictactoe(players, pl1, pl2);
-        game.start();
+        return Integer.parseInt(input);
     }
-}
-
-class tictactoeHelper {
     public String SymbolSelector() {
-        Scanner scan = new Scanner(System.in);
         System.out.println("Select symbol ('X' or '0')");
         String SYM = scan.nextLine();
+        SYM = SYM.toUpperCase();
         boolean cont = false;
         while (!cont) {
             switch (SYM) {
                 case "X":
-                case "x":
                 case "Х":
-                case "х":
                 case "+":
                     SYM = "X";
                     cont = true;
                     break;
                 case "0":
                 case "O":
-                case "o":
                 case "О":
-                case "о":
                     SYM = "0";
                     cont = true;
                     break;
@@ -65,7 +129,7 @@ class tictactoeHelper {
     }
 }
 
-public class tictactoe {
+public class tictactoe  {
     private String[][] board = new String[][]{{" ", " ", " "}, {" ", " ", " "}, {" ", " ", " "},};
     private int players = 1;
     private String p1;
@@ -82,13 +146,13 @@ public class tictactoe {
         this.print();
         System.out.println(players);
         if (this.players == 1) {
-            this.game1P();
+            this.game(1);
         } else {
-            this.game2P();
+            this.game(2);
         }
     }
 
-    private void game2P() {
+    private void game(int pl) {
         for (int i = 0; i < 9; i++) {
             player(1);
             print();
@@ -100,28 +164,12 @@ public class tictactoe {
                 if (i == 9) {
                     break;
                 }
-                player(2);
-                print();
-                if (checkWin()) {
-                    return;
+                if(pl == 1){
+                    bot();
                 }
-            }
-        }
-    }
-
-    private void game1P() {
-        for (int i = 0; i < 9; i++) {
-            player(1);
-            print();
-            if (checkWin()) {
-                return;
-            }
-            i++;
-            if (i % 2 != 0) {
-                if (i == 9) {
-                    break;
+                else {
+                    player(2);
                 }
-                bot();
                 print();
                 if (checkWin()) {
                     return;
@@ -144,25 +192,19 @@ public class tictactoe {
             if (place.length() == 2) {
                 if (place.substring(1).equals("1") || place.substring(1).equals("2") || place.substring(1).equals("3")) {
                     x = Integer.parseInt(place.substring(1));
-                    switch (place.substring(0, 1)) {
+                    switch (place.substring(0, 1).toUpperCase()) {
                         case "A":
-                        case "a":
                         case "А":
-                        case "а":
                             y = 1;
                             err = false;
                             break;
                         case "B":
-                        case "b":
                         case "В":
-                        case "в":
                             y = 2;
                             err = false;
                             break;
                         case "C":
-                        case "c":
                         case "С":
-                        case "с":
                             y = 3;
                             err = false;
                             break;
