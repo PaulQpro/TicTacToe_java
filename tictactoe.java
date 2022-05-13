@@ -135,10 +135,9 @@ public class tictactoe {
         int x = 0;
         int y = 0;
         while (err) {
-            if(player==1){
+            if (player == 1) {
                 System.out.println("Select place: (" + this.p1 + ")");
-            }
-            else {
+            } else {
                 System.out.println("Select place: (" + this.p2 + ")");
             }
             String place = scan.nextLine();
@@ -191,28 +190,25 @@ public class tictactoe {
                 System.out.println("Error, select again!");
             }
         }
-        if(player==1) {
+        if (player == 1) {
             board[x][y] = this.p1;
-        }
-        else {
+        } else {
             board[x][y] = this.p2;
         }
     }
 
     private void bot() {
         boolean check = false;
-        for(int i = 0;i<3;i++){
+        for (int i = 0; i < 3; i++) {
             if (board[i][0].equals(p2) && board[i][1].equals(p2) && board[i][2].equals(" ")) {
                 board[i][2] = p2;
                 check = true;
                 break;
-            }
-            else if (board[i][0].equals(p2) && board[i][1].equals(" ") && board[i][2].equals(p2)) {
+            } else if (board[i][0].equals(p2) && board[i][1].equals(" ") && board[i][2].equals(p2)) {
                 board[i][1] = p2;
                 check = true;
                 break;
-            }
-            else if (board[i][0].equals(" ") && board[i][1].equals(p2) && board[i][2].equals(p2)) {
+            } else if (board[i][0].equals(" ") && board[i][1].equals(p2) && board[i][2].equals(p2)) {
                 board[i][0] = p2;
                 check = true;
                 break;
@@ -221,19 +217,17 @@ public class tictactoe {
                 board[2][i] = p2;
                 check = true;
                 break;
-            }
-            else if (board[0][i].equals(p2) && board[1][i].equals(" ") && board[2][i].equals(p2)) {
+            } else if (board[0][i].equals(p2) && board[1][i].equals(" ") && board[2][i].equals(p2)) {
                 board[1][i] = p2;
                 check = true;
                 break;
-            }
-            else if (board[0][i].equals(" ") && board[1][i].equals(p2) && board[2][i].equals(p2)) {
+            } else if (board[0][i].equals(" ") && board[1][i].equals(p2) && board[2][i].equals(p2)) {
                 board[0][i] = p2;
                 check = true;
                 break;
             }
         }
-        if(!check){
+        if (!check) {
             if (board[0][0].equals(p2) && board[1][1].equals(p2) && board[2][2].equals(" ")) {
                 board[2][2] = p2;
                 check = true;
@@ -256,20 +250,18 @@ public class tictactoe {
             }
         }
         for (int i = 0; i < 3; i++) {
-            if(check){
+            if (check) {
                 break;
             }
             if (board[i][0].equals(p1) && board[i][1].equals(p1) && board[i][2].equals(" ")) {
                 board[i][2] = p2;
                 check = true;
                 break;
-            }
-            else if (board[i][0].equals(p1) && board[i][1].equals(" ") && board[i][2].equals(p1)) {
+            } else if (board[i][0].equals(p1) && board[i][1].equals(" ") && board[i][2].equals(p1)) {
                 board[i][1] = p2;
                 check = true;
                 break;
-            }
-            else if (board[i][0].equals(" ") && board[i][1].equals(p1) && board[i][2].equals(p1)) {
+            } else if (board[i][0].equals(" ") && board[i][1].equals(p1) && board[i][2].equals(p1)) {
                 board[i][0] = p2;
                 check = true;
                 break;
@@ -278,19 +270,17 @@ public class tictactoe {
                 board[2][i] = p2;
                 check = true;
                 break;
-            }
-            else if (board[0][i].equals(p1) && board[1][i].equals(" ") && board[2][i].equals(p1)) {
+            } else if (board[0][i].equals(p1) && board[1][i].equals(" ") && board[2][i].equals(p1)) {
                 board[1][i] = p2;
                 check = true;
                 break;
-            }
-            else if (board[0][i].equals(" ") && board[1][i].equals(p1) && board[2][i].equals(p1)) {
+            } else if (board[0][i].equals(" ") && board[1][i].equals(p1) && board[2][i].equals(p1)) {
                 board[0][i] = p2;
                 check = true;
                 break;
             }
         }
-        if(!check){
+        if (!check) {
             if (board[0][0].equals(p1) && board[1][1].equals(p1) && board[2][2].equals(" ")) {
                 board[2][2] = p2;
                 check = true;
