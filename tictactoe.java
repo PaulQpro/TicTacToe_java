@@ -130,7 +130,7 @@ class tictactoeHelper {
 }
 
 public class tictactoe  {
-    private String[][] board = new String[][]{{" ", " ", " "}, {" ", " ", " "}, {" ", " ", " "},};
+    private String[][] board = new String[][]{{" ", " ", " "}, {" ", " ", " "}, {" ", " ", " "}};
     private int players = 1;
     private String p1;
     private String p2;
