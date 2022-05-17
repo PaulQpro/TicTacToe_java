@@ -8,20 +8,7 @@ class Main {
         char res = helper.menu(MenuTypes.UI);
         while (res != 'q') {
             if (res == 'p') {
-                int players = helper.PlayersSelector();
-                String pl1 = helper.SymbolSelector();
-                String pl2 = "0";
-                switch (pl1) {
-                    case "X":
-                        pl2 = "0";
-                        break;
-                    case "0":
-                        pl2 = "X";
-                        break;
-                }
-                tictactoe game = new tictactoe(players, pl1, pl2);
-                game.start();
-                res = helper.menu(MenuTypes.CONSOLE);
+                helper.finalPrep();
             }
             else if (res == 'h') {
                 helper.help();
@@ -31,15 +18,44 @@ class Main {
         System.out.print("Goodbye!");
     }
 }
-
-enum MenuTypes{
+/**/
+/*For menu displaying*/enum MenuTypes{
     UI,
     CONSOLE
 }
 
-class tictactoeHelper {
+/*Preparation for game*/class tictactoeHelper {
     private final Scanner scan = new Scanner(System.in);
-    public void help(){
+    /*Player's name input*/public void nameSelector(int pl){
+        System.out.print("Player №"+pl+":Enter your name\n>");
+        String Name = scan.nextLine().trim();
+        boolean err = true;
+        while (err){
+            if(Name.equals("")){
+                System.out.println("Emtry input, try again!");
+                System.out.print("Player №"+pl+":Enter your name\n>");
+                Name = scan.nextLine().trim();
+            }
+        }
+    }
+    /*Auto-selecting 2nd player's symbol('0' or 'X') and final preparations*/public void finalPrep(){
+        int players = this.playersSelector();
+        String pl1 = this.symbolSelector();
+        String pl2 = "0";
+        switch (pl1) {
+            case "X":
+                pl2 = "0";
+                break;
+            case "0":
+                pl2 = "X";
+                break;
+        }
+        nameSelector(1);
+        tictactoe game = new tictactoe(players, pl1, pl2);
+        game.start();
+        this.menu(MenuTypes.CONSOLE);
+    }
+    /*Help menu*/public void help(){
         System.out.println("   ┌────────────────────┐");
         System.out.println("═══╡This is a 3*3 board ╞═══");
         System.out.println("   ╞════════════════════╡");
@@ -56,7 +72,7 @@ class tictactoeHelper {
         System.out.println("and not:\n    1) '1A', '2B', '1C', etc.;\n    2) '1a', '2b', '1c', etc.;");
         System.out.println("P.S.: If you don't no common tic-tac-toe rules,\n      search in Google, not here!");
     }
-    public char menu( MenuTypes type){
+    /*Main menu*/public char menu(MenuTypes type){
         char r;
         if(type == MenuTypes.UI) {
             System.out.println("═══════════╦═════════════╦═══════════");
@@ -86,7 +102,7 @@ class tictactoeHelper {
             return r;
         }
     }
-    public int PlayersSelector(){
+    /*Selecting Players count(1,2)*/public int playersSelector(){
         System.out.println("Enter number of players (1 or 2)");
         String input = scan.nextLine();
         input = input.trim();
@@ -98,7 +114,7 @@ class tictactoeHelper {
         }
         return Integer.parseInt(input);
     }
-    public String SymbolSelector() {
+    /*Selecting 1st player's symbol('X' or '0')*/private String symbolSelector() {
         System.out.println("Select symbol ('X' or '0')");
         String SYM = scan.nextLine();
         SYM = SYM.toUpperCase();
@@ -129,20 +145,19 @@ class tictactoeHelper {
     }
 }
 
-public class tictactoe  {
-    private String[][] board = new String[][]{{" ", " ", " "}, {" ", " ", " "}, {" ", " ", " "}};
-    private int players = 1;
-    private String p1;
-    private String p2;
+/*Game itself*/public class tictactoe  {
+    /*Game field*/private String[][] board = new String[][]{{" ", " ", " "}, {" ", " ", " "}, {" ", " ", " "}};
+    /*Players count*/private int players;
+    /*Players' symbols*/private String[] sym = new String[2];
     private final Scanner scan = new Scanner(System.in);
 
     public tictactoe(int players, String p1, String p2) {
-        this.p1 = p1;
-        this.p2 = p2;
+        this.sym[0] = p1;
+        this.sym[1] = p2;
         this.players = players;
     }
 
-    public void start() {
+    /*Starting game*/public void start() {
         this.print();
         System.out.println(players);
         if (this.players == 1) {
@@ -152,7 +167,7 @@ public class tictactoe  {
         }
     }
 
-    private void game(int pl) {
+    /*Moves*/private void game(int pl) {
         for (int i = 0; i < 9; i++) {
             player(1);
             print();
@@ -178,18 +193,18 @@ public class tictactoe  {
         }
     }
 
-    private void player(int player) {
+    /*Player's move*/private void player(int player) {
         boolean err = true;
         int x = 0;
         int y = 0;
         while (err) {
             if (player == 1) {
-                System.out.println("Select place: (" + this.p1 + ")");
+                System.out.println("Select place: (" + this.sym[0] + ")");
             } else {
-                System.out.println("Select place: (" + this.p2 + ")");
+                System.out.println("Select place: (" + this.sym[1] + ")");
             }
             String place = scan.nextLine();
-            if (place.length() == 2) {
+            /*Validating input*/if (place.length() == 2) {
                 if (place.substring(1).equals("1") || place.substring(1).equals("2") || place.substring(1).equals("3")) {
                     x = Integer.parseInt(place.substring(1));
                     switch (place.substring(0, 1).toUpperCase()) {
@@ -233,130 +248,126 @@ public class tictactoe  {
             }
         }
         if (player == 1) {
-            board[x][y] = this.p1;
+            board[x][y] = this.sym[0];
         } else {
-            board[x][y] = this.p2;
+            board[x][y] = this.sym[1];
         }
     }
 
-    private void bot() {
+    /*Bot's move*/private void bot() {
         boolean check = false;
-        for (int i = 0; i < 3; i++) {
-            if (board[i][0].equals(p2) && board[i][1].equals(p2) && board[i][2].equals(" ")) {
-                board[i][2] = p2;
+        /*cheking for possible win*/for (int i = 0; i < 3; i++) {
+            if (board[i][0].equals(sym[1]) && board[i][1].equals(sym[1]) && board[i][2].equals(" ")) {
+                board[i][2] = sym[1];
                 check = true;
                 break;
-            } else if (board[i][0].equals(p2) && board[i][1].equals(" ") && board[i][2].equals(p2)) {
-                board[i][1] = p2;
+            } else if (board[i][0].equals(sym[1]) && board[i][1].equals(" ") && board[i][2].equals(sym[1])) {
+                board[i][1] = sym[1];
                 check = true;
                 break;
-            } else if (board[i][0].equals(" ") && board[i][1].equals(p2) && board[i][2].equals(p2)) {
-                board[i][0] = p2;
-                check = true;
-                break;
-            }
-            if (board[0][i].equals(p2) && board[1][i].equals(p2) && board[2][i].equals(" ")) {
-                board[2][i] = p2;
-                check = true;
-                break;
-            } else if (board[0][i].equals(p2) && board[1][i].equals(" ") && board[2][i].equals(p2)) {
-                board[1][i] = p2;
-                check = true;
-                break;
-            } else if (board[0][i].equals(" ") && board[1][i].equals(p2) && board[2][i].equals(p2)) {
-                board[0][i] = p2;
+            } else if (board[i][0].equals(" ") && board[i][1].equals(sym[1]) && board[i][2].equals(sym[1])) {
+                board[i][0] = sym[1];
                 check = true;
                 break;
             }
-        }
-        if (!check) {
-            if (board[0][0].equals(p2) && board[1][1].equals(p2) && board[2][2].equals(" ")) {
-                board[2][2] = p2;
+            if (board[0][i].equals(sym[1]) && board[1][i].equals(sym[1]) && board[2][i].equals(" ")) {
+                board[2][i] = sym[1];
                 check = true;
-            } else if (board[0][0].equals(p2) && board[1][1].equals(" ") && board[2][2].equals(p2)) {
-                board[1][1] = p2;
+                break;
+            } else if (board[0][i].equals(sym[1]) && board[1][i].equals(" ") && board[2][i].equals(sym[1])) {
+                board[1][i] = sym[1];
                 check = true;
-            } else if (board[0][0].equals(" ") && board[1][1].equals(p2) && board[2][2].equals(p2)) {
-                board[0][0] = p2;
+                break;
+            } else if (board[0][i].equals(" ") && board[1][i].equals(sym[1]) && board[2][i].equals(sym[1])) {
+                board[0][i] = sym[1];
                 check = true;
-            }
-            if (board[0][2].equals(p2) && board[1][1].equals(p2) && board[2][0].equals(" ")) {
-                board[2][0] = p2;
-                check = true;
-            } else if (board[0][2].equals(p2) && board[1][1].equals(" ") && board[2][0].equals(p2)) {
-                board[1][1] = p2;
-                check = true;
-            } else if (board[0][2].equals(" ") && board[1][1].equals(p2) && board[2][0].equals(p2)) {
-                board[0][2] = p2;
-                check = true;
+                break;
             }
         }
-        for (int i = 0; i < 3; i++) {
+        /*cheking for possible win (continue)*/if (!check) {
+            if (board[0][0].equals(sym[1]) && board[1][1].equals(sym[1]) && board[2][2].equals(" ")) {
+                board[2][2] = sym[1];
+                check = true;
+            } else if (board[0][0].equals(sym[1]) && board[1][1].equals(" ") && board[2][2].equals(sym[1])) {
+                board[1][1] = sym[1];
+                check = true;
+            } else if (board[0][0].equals(" ") && board[1][1].equals(sym[1]) && board[2][2].equals(sym[1])) {
+                board[0][0] = sym[1];
+                check = true;
+            }
+            if (board[0][2].equals(sym[1]) && board[1][1].equals(sym[1]) && board[2][0].equals(" ")) {
+                board[2][0] = sym[1];
+                check = true;
+            } else if (board[0][2].equals(sym[1]) && board[1][1].equals(" ") && board[2][0].equals(sym[1])) {
+                board[1][1] = sym[1];
+                check = true;
+            } else if (board[0][2].equals(" ") && board[1][1].equals(sym[1]) && board[2][0].equals(sym[1])) {
+                board[0][2] = sym[1];
+                check = true;
+            }
+        }
+        /*cheking for possible lose*/for (int i = 0; i < 3; i++) {
             if (check) {
                 break;
             }
-            if (board[i][0].equals(p1) && board[i][1].equals(p1) && board[i][2].equals(" ")) {
-                board[i][2] = p2;
+            if (board[i][0].equals(sym[0]) && board[i][1].equals(sym[0]) && board[i][2].equals(" ")) {
+                board[i][2] = sym[1];
                 check = true;
                 break;
-            } else if (board[i][0].equals(p1) && board[i][1].equals(" ") && board[i][2].equals(p1)) {
-                board[i][1] = p2;
+            } else if (board[i][0].equals(sym[0]) && board[i][1].equals(" ") && board[i][2].equals(sym[0])) {
+                board[i][1] = sym[1];
                 check = true;
                 break;
-            } else if (board[i][0].equals(" ") && board[i][1].equals(p1) && board[i][2].equals(p1)) {
-                board[i][0] = p2;
+            } else if (board[i][0].equals(" ") && board[i][1].equals(sym[0]) && board[i][2].equals(sym[0])) {
+                board[i][0] = sym[1];
                 check = true;
                 break;
             }
-            if (board[0][i].equals(p1) && board[1][i].equals(p1) && board[2][i].equals(" ")) {
-                board[2][i] = p2;
+            if (board[0][i].equals(sym[0]) && board[1][i].equals(sym[0]) && board[2][i].equals(" ")) {
+                board[2][i] = sym[1];
                 check = true;
                 break;
-            } else if (board[0][i].equals(p1) && board[1][i].equals(" ") && board[2][i].equals(p1)) {
-                board[1][i] = p2;
+            } else if (board[0][i].equals(sym[0]) && board[1][i].equals(" ") && board[2][i].equals(sym[0])) {
+                board[1][i] = sym[1];
                 check = true;
                 break;
-            } else if (board[0][i].equals(" ") && board[1][i].equals(p1) && board[2][i].equals(p1)) {
-                board[0][i] = p2;
+            } else if (board[0][i].equals(" ") && board[1][i].equals(sym[0]) && board[2][i].equals(sym[0])) {
+                board[0][i] = sym[1];
                 check = true;
                 break;
             }
         }
-        if (!check) {
-            if (board[0][0].equals(p1) && board[1][1].equals(p1) && board[2][2].equals(" ")) {
-                board[2][2] = p2;
+        /*cheking for possible lose (continue)*/if (!check) {
+            if (board[0][0].equals(sym[0]) && board[1][1].equals(sym[0]) && board[2][2].equals(" ")) {
+                board[2][2] = sym[1];
                 check = true;
-            } else if (board[0][0].equals(p1) && board[1][1].equals(" ") && board[2][2].equals(p1)) {
-                board[1][1] = p2;
+            } else if (board[0][0].equals(sym[0]) && board[1][1].equals(" ") && board[2][2].equals(sym[0])) {
+                board[1][1] = sym[1];
                 check = true;
-            } else if (board[0][0].equals(" ") && board[1][1].equals(p1) && board[2][2].equals(p1)) {
-                board[0][0] = p2;
+            } else if (board[0][0].equals(" ") && board[1][1].equals(sym[0]) && board[2][2].equals(sym[0])) {
+                board[0][0] = sym[1];
                 check = true;
             }
-            if (board[0][2].equals(p1) && board[1][1].equals(p1) && board[2][0].equals(" ")) {
-                board[2][0] = p2;
+            if (board[0][2].equals(sym[0]) && board[1][1].equals(sym[0]) && board[2][0].equals(" ")) {
+                board[2][0] = sym[1];
                 check = true;
-            } else if (board[0][2].equals(p1) && board[1][1].equals(" ") && board[2][0].equals(p1)) {
-                board[1][1] = p2;
+            } else if (board[0][2].equals(sym[0]) && board[1][1].equals(" ") && board[2][0].equals(sym[0])) {
+                board[1][1] = sym[1];
                 check = true;
-            } else if (board[0][2].equals(" ") && board[1][1].equals(p1) && board[2][0].equals(p1)) {
-                board[0][2] = p2;
+            } else if (board[0][2].equals(" ") && board[1][1].equals(sym[0]) && board[2][0].equals(sym[0])) {
+                board[0][2] = sym[1];
                 check = true;
             }
         }
         if (check == true) {
             return;
         }
-        int x = (int) (Math.random() * 3);
-        int y = (int) (Math.random() * 3);
-        while (board[x][y] != " ") {
-            x = (int) (Math.random() * 3);
-            y = (int) (Math.random() * 3);
-        }
-        this.board[x][y] = p2;
+        int x = (int) (Math.random() * 3);int y = (int) (Math.random() * 3);
+        while (board[x][y] != " ") {x = (int) (Math.random() * 3);y = (int) (Math.random() * 3);}//if can't win or lose
+        this.board[x][y] = sym[1];
     }
 
-    private boolean checkWin() {
+    /*Cheking for win*/private boolean checkWin() {
         for (int i = 0; i < 3; i++) {
             if (board[i][0].equals("X") && board[i][1].equals("X") && board[i][2].equals("X")) {
                 System.out.println("'X' wins!");
@@ -396,7 +407,7 @@ public class tictactoe  {
         return false;
     }
 
-    public void print() {
+    /*Displaying field*/public void print() {
         System.out.println("    A   B   C");
         System.out.println("  ╔═══╦═══╦═══╗");
         System.out.println("1 ║ " + this.board[0][0] + " ║ " + this.board[0][1] + " ║ " + this.board[0][2] + " ║");
