@@ -9,8 +9,7 @@ class Main {
         while (res != 'q') {
             if (res == 'p') {
                 helper.finalPrep();
-            }
-            else if (res == 'h') {
+            } else if (res == 'h') {
                 helper.help();
                 res = helper.menu(MenuTypes.CONSOLE);
             }
@@ -18,27 +17,35 @@ class Main {
         System.out.print("Goodbye!");
     }
 }
+
 /**/
-/*For menu displaying*/enum MenuTypes{
+/*For menu displaying*/enum MenuTypes {
     UI,
     CONSOLE
 }
 
 /*Preparation for game*/class tictactoeHelper {
     private final Scanner scan = new Scanner(System.in);
-    /*Player's name input*/public void nameSelector(int pl){
-        System.out.print("Player №"+pl+":Enter your name\n>");
+    private String[] name = new String[2];
+
+    /*Player's name input*/
+    public void nameSelector(int pl) {
+        System.out.print("Player №" + pl + ":Enter your name\n>");
         String Name = scan.nextLine().trim();
         boolean err = true;
-        while (err){
-            if(Name.equals("")){
-                System.out.println("Emtry input, try again!");
-                System.out.print("Player №"+pl+":Enter your name\n>");
+        while (err) {
+            if (Name.equals("")) {
+                System.out.print("Emtry input, enter again!\n>");
                 Name = scan.nextLine().trim();
+            } else {
+                err = false;
             }
         }
+        this.name[pl - 1] = Name;
     }
-    /*Auto-selecting 2nd player's symbol('0' or 'X') and final preparations*/public void finalPrep(){
+
+    /*Auto-selecting 2nd player's symbol('0' or 'X') and final preparations*/
+    public void finalPrep() {
         int players = this.playersSelector();
         String pl1 = this.symbolSelector();
         String pl2 = "0";
@@ -51,11 +58,18 @@ class Main {
                 break;
         }
         nameSelector(1);
-        tictactoe game = new tictactoe(players, pl1, pl2);
+        if (players == 2) {
+            nameSelector(2);
+        } else {
+            this.name[1] = "Bot";
+        }
+        tictactoe game = new tictactoe(players, pl1, pl2, this.name);
         game.start();
         this.menu(MenuTypes.CONSOLE);
     }
-    /*Help menu*/public void help(){
+
+    /*Help menu*/
+    public void help() {
         System.out.println("   ┌────────────────────┐");
         System.out.println("═══╡This is a 3*3 board ╞═══");
         System.out.println("   ╞════════════════════╡");
@@ -72,9 +86,11 @@ class Main {
         System.out.println("and not:\n    1) '1A', '2B', '1C', etc.;\n    2) '1a', '2b', '1c', etc.;");
         System.out.println("P.S.: If you don't no common tic-tac-toe rules,\n      search in Google, not here!");
     }
-    /*Main menu*/public char menu(MenuTypes type){
+
+    /*Main menu*/
+    public char menu(MenuTypes type) {
         char r;
-        if(type == MenuTypes.UI) {
+        if (type == MenuTypes.UI) {
             System.out.println("═══════════╦═════════════╦═══════════");
             System.out.println("───────────╢ Tic-Tac-Toe ╟───────────");
             System.out.println("═══════════╩═════════════╩═══════════");
@@ -85,37 +101,39 @@ class Main {
             System.out.println("═════════════════════════════════════");
         }
         boolean err = true;
-        do{
+        do {
             System.out.print("tictactoe\\>");
             r = scan.nextLine().toLowerCase().charAt(0);
-            if(!(r=='q'||r=='h'||r=='p'||r=='m')){
+            if (!(r == 'q' || r == 'h' || r == 'p' || r == 'm')) {
                 System.out.println("Wrong! Select one from menu");
-            }
-            else {
+            } else {
                 err = false;
             }
-        }while (err);
-        if(r=='m'){
+        } while (err);
+        if (r == 'm') {
             return menu(MenuTypes.UI);
-        }
-        else{
+        } else {
             return r;
         }
     }
-    /*Selecting Players count(1,2)*/public int playersSelector(){
-        System.out.println("Enter number of players (1 or 2)");
+
+    /*Selecting Players count(1,2)*/
+    public int playersSelector() {
+        System.out.print("Enter number of players (1 or 2)\n>");
         String input = scan.nextLine();
         input = input.trim();
         int players = 0;
         while (!(input.equals("1") || input.equals("2"))) {
-            System.out.println("Wrong input, type 1 or 2");
+            System.out.print("Wrong input, type 1 or 2\n>");
             input = scan.nextLine();
             input = input.trim();
         }
         return Integer.parseInt(input);
     }
-    /*Selecting 1st player's symbol('X' or '0')*/private String symbolSelector() {
-        System.out.println("Select symbol ('X' or '0')");
+
+    /*Selecting 1st player's symbol('X' or '0')*/
+    private String symbolSelector() {
+        System.out.print("Select symbol ('X' or '0')\n>");
         String SYM = scan.nextLine();
         SYM = SYM.toUpperCase();
         boolean cont = false;
@@ -134,7 +152,7 @@ class Main {
                     cont = true;
                     break;
                 default:
-                    System.out.println("Wrong input, type 'X' or '0'");
+                    System.out.print("Wrong input, type 'X' or '0'\n>");
             }
             if (cont) {
                 break;
@@ -145,19 +163,22 @@ class Main {
     }
 }
 
-/*Game itself*/public class tictactoe  {
+/*Game itself*/public class tictactoe {
     /*Game field*/private String[][] board = new String[][]{{" ", " ", " "}, {" ", " ", " "}, {" ", " ", " "}};
     /*Players count*/private int players;
     /*Players' symbols*/private String[] sym = new String[2];
+    /**/private String[] names = new String[2];
     private final Scanner scan = new Scanner(System.in);
 
-    public tictactoe(int players, String p1, String p2) {
+    public tictactoe(int players, String p1, String p2, String[] names) {
         this.sym[0] = p1;
         this.sym[1] = p2;
         this.players = players;
+        this.names = names;
     }
 
-    /*Starting game*/public void start() {
+    /*Starting game*/
+    public void start() {
         this.print();
         System.out.println(players);
         if (this.players == 1) {
@@ -167,7 +188,8 @@ class Main {
         }
     }
 
-    /*Moves*/private void game(int pl) {
+    /*Moves*/
+    private void game(int pl) {
         for (int i = 0; i < 9; i++) {
             player(1);
             print();
@@ -179,10 +201,9 @@ class Main {
                 if (i == 9) {
                     break;
                 }
-                if(pl == 1){
+                if (pl == 1) {
                     bot();
-                }
-                else {
+                } else {
                     player(2);
                 }
                 print();
@@ -193,18 +214,20 @@ class Main {
         }
     }
 
-    /*Player's move*/private void player(int player) {
+    /*Player's move*/
+    private void player(int player) {
         boolean err = true;
         int x = 0;
         int y = 0;
         while (err) {
             if (player == 1) {
-                System.out.println("Select place: (" + this.sym[0] + ")");
+                System.out.print(this.names[0] + ", select place for move\n>");
             } else {
-                System.out.println("Select place: (" + this.sym[1] + ")");
+                System.out.print(this.names[1] + ", select place for move\n>");
             }
             String place = scan.nextLine();
-            /*Validating input*/if (place.length() == 2) {
+            /*Validating input*/
+            if (place.length() == 2) {
                 if (place.substring(1).equals("1") || place.substring(1).equals("2") || place.substring(1).equals("3")) {
                     x = Integer.parseInt(place.substring(1));
                     switch (place.substring(0, 1).toUpperCase()) {
@@ -254,9 +277,11 @@ class Main {
         }
     }
 
-    /*Bot's move*/private void bot() {
+    /*Bot's move*/
+    private void bot() {
         boolean check = false;
-        /*cheking for possible win*/for (int i = 0; i < 3; i++) {
+        /*cheking for possible win*/
+        for (int i = 0; i < 3; i++) {
             if (board[i][0].equals(sym[1]) && board[i][1].equals(sym[1]) && board[i][2].equals(" ")) {
                 board[i][2] = sym[1];
                 check = true;
@@ -284,7 +309,8 @@ class Main {
                 break;
             }
         }
-        /*cheking for possible win (continue)*/if (!check) {
+        /*cheking for possible win (continue)*/
+        if (!check) {
             if (board[0][0].equals(sym[1]) && board[1][1].equals(sym[1]) && board[2][2].equals(" ")) {
                 board[2][2] = sym[1];
                 check = true;
@@ -306,7 +332,8 @@ class Main {
                 check = true;
             }
         }
-        /*cheking for possible lose*/for (int i = 0; i < 3; i++) {
+        /*cheking for possible lose*/
+        for (int i = 0; i < 3; i++) {
             if (check) {
                 break;
             }
@@ -337,7 +364,8 @@ class Main {
                 break;
             }
         }
-        /*cheking for possible lose (continue)*/if (!check) {
+        /*cheking for possible lose (continue)*/
+        if (!check) {
             if (board[0][0].equals(sym[0]) && board[1][1].equals(sym[0]) && board[2][2].equals(" ")) {
                 board[2][2] = sym[1];
                 check = true;
@@ -362,12 +390,17 @@ class Main {
         if (check == true) {
             return;
         }
-        int x = (int) (Math.random() * 3);int y = (int) (Math.random() * 3);
-        while (board[x][y] != " ") {x = (int) (Math.random() * 3);y = (int) (Math.random() * 3);}//if can't win or lose
+        int x = (int) (Math.random() * 3);
+        int y = (int) (Math.random() * 3);
+        while (board[x][y] != " ") {
+            x = (int) (Math.random() * 3);
+            y = (int) (Math.random() * 3);
+        }//if can't win or lose
         this.board[x][y] = sym[1];
     }
 
-    /*Cheking for win*/private boolean checkWin() {
+    /*Cheking for win*/
+    private boolean checkWin() {
         for (int i = 0; i < 3; i++) {
             if (board[i][0].equals("X") && board[i][1].equals("X") && board[i][2].equals("X")) {
                 System.out.println("'X' wins!");
@@ -407,7 +440,8 @@ class Main {
         return false;
     }
 
-    /*Displaying field*/public void print() {
+    /*Displaying field*/
+    public void print() {
         System.out.println("    A   B   C");
         System.out.println("  ╔═══╦═══╦═══╗");
         System.out.println("1 ║ " + this.board[0][0] + " ║ " + this.board[0][1] + " ║ " + this.board[0][2] + " ║");
